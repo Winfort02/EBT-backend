@@ -1,0 +1,140 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  EMPLOYEE
+  ADMIN
+  SUB_ADMIN
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique() @db.VarChar(100)
+  password String @db.VarChar(350)
+  roleId Int @unique()
+  role UserRole @relation(fields: [roleId], references: [id])
+  displayName String @unique @db.VarChar(100)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+  token UserToken?
+
+  @@map("users")
+}
+
+model UserToken {
+  id Int @id @default(autoincrement())
+  accessToken String @db.Text()
+  refreshToken String @db.Text()
+  userId Int @unique()
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("tokens")
+}
+
+model UserRole {
+  id Int @id @default(autoincrement())
+  role Role @default(EMPLOYEE) @unique()
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+  user User?
+  permissions Permission[]
+  @@map("roles")
+}
+
+model Permission {
+  id Int @id @default(autoincrement())
+  userRoleId Int @unique()
+  userRole UserRole @relation(fields: [userRoleId], references: [id])
+  module String @db.VarChar(100)
+  canAdd Boolean @default(false)
+  canEdit Boolean @default(false)
+  canRead Boolean @default(false)
+  canApprove Boolean @default(false)
+  canDelete Boolean @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  @@map("permissions")
+}
+
+model Person {
+  id Int @id @default(autoincrement())
+  fullName String @db.VarChar(150)
+  phoneNumber String @db.VarChar(15)
+  Address String @db.VarChar(250)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+  
+  loans Loan[]
+
+  @@map("persons")
+}
+
+model LoanType {
+  id Int @id @default(autoincrement())
+  type String @db.VarChar(150)
+  remarks String @db.Text
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  budget LoanBudget[]
+
+  @@map("loan_types")
+}
+
+model LoanBudget {
+  id Int @id @default(autoincrement())
+  loanTypeId Int
+  loanType LoanType @relation(fields: [loanTypeId], references: [id])
+  amount Decimal @db.Decimal(10, 2)
+  effectiveStartDate DateTime
+  effectiveEndtDate DateTime
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  loans Loan[]
+
+  @@map("loan_budget")
+}
+
+model Loan {
+  id Int @id @default(autoincrement())
+  loanBudgetId Int
+  loanBudget LoanBudget @relation(fields: [loanBudgetId], references: [id])
+  personId Int
+  person Person @relation(fields: [personId], references: [id])
+  amount Decimal @db.Decimal(10, 2)
+  balance Decimal @db.Decimal(10, 2)
+  effectiveStartDate DateTime
+  effectiveEndDate DateTime
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  payments LoanPayment[]
+
+  @@map("loans")
+}
+
+model LoanPayment {
+  id Int @id @default(autoincrement())
+  loanId Int
+  loan Loan @relation(fields: [loanId], references: [id])
+  amount Decimal @db.Decimal(10, 2)
+  date DateTime @db.Timestamp(3)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  @@map("loan_payments")
+}
