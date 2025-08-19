@@ -4,6 +4,7 @@ import { UserModule } from './features/user/user.module';
 import { PrismaModule } from './features/prisma/prisma.module';
 import { ConfigModule, ConfigService  } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { PersonModule } from './features/person/person.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     AuthModule, 
     UserModule, 
-    PrismaModule],
+    PrismaModule, 
+    PersonModule],
    exports: [JwtModule],
 })
 export class AppModule {}

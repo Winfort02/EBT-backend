@@ -61,8 +61,8 @@ export class AuthService {
    * @returns AccessToken
    */
   private async generateTokenAsync(user: UserModel, secret: string) {
-  const { email, name, id } = user;
-  const payload = { email, sub: { name, id }};
+  const { email, displayName, id } = user;
+  const payload = { email, sub: { displayName, id }};
   return await this.jwtService.signAsync(payload, { expiresIn: '1h', secret});
   }
 }
