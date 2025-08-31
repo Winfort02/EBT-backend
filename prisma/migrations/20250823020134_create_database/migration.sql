@@ -109,9 +109,51 @@ CREATE TABLE `loan_payments` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `loanId` INTEGER NOT NULL,
     `amount` DECIMAL(10, 2) NOT NULL,
-    `date` TIMESTAMP(3) NOT NULL,
+    `date` DATETIME NOT NULL,
     `createdAt` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `projects` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `project` VARCHAR(100) NOT NULL,
+    `client` VARCHAR(100) NOT NULL,
+    `location` VARCHAR(100) NOT NULL,
+    `transactionNo` VARCHAR(100) NOT NULL,
+    `startDate` DATETIME(3) NOT NULL,
+    `endDate` DATETIME(3) NOT NULL,
+    `budget` DECIMAL(10, 2) NOT NULL,
+    `status` ENUM('PENDING', 'ACTIVE', 'RISK', 'COMPLETED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    `createdAt` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `workers` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `projectId` INTEGER NOT NULL,
+    `personId` INTEGER NOT NULL,
+    `shiftStart` DATETIME(3) NOT NULL,
+    `shiftEnd` DATETIME(3) NOT NULL,
+    `createdAt` TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `equipments` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `projectId` INTEGER NOT NULL,
+    `name` VARCHAR(100) NOT NULL,
+    `quantity` INTEGER NOT NULL,
+    `unit` ENUM('PCS', 'KG', 'METER', 'BAGS') NOT NULL,
+    `price` DECIMAL(10, 2) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -136,3 +178,12 @@ ALTER TABLE `loans` ADD CONSTRAINT `loans_personId_fkey` FOREIGN KEY (`personId`
 
 -- AddForeignKey
 ALTER TABLE `loan_payments` ADD CONSTRAINT `loan_payments_loanId_fkey` FOREIGN KEY (`loanId`) REFERENCES `loans`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `workers` ADD CONSTRAINT `workers_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `workers` ADD CONSTRAINT `workers_personId_fkey` FOREIGN KEY (`personId`) REFERENCES `persons`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `equipments` ADD CONSTRAINT `equipments_projectId_fkey` FOREIGN KEY (`projectId`) REFERENCES `projects`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;

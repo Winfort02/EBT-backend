@@ -19,6 +19,21 @@ enum Role {
   SUB_ADMIN
 }
 
+enum Unit {
+  PCS
+  KG
+  METER
+  BAGS
+}
+
+enum ProjectStatus {
+  PENDING
+  ACTIVE
+  RISK
+  COMPLETED
+  REJECTED
+}
+
 model User {
   id Int @id @default(autoincrement())
   email String @unique() @db.VarChar(100)
@@ -78,6 +93,7 @@ model Person {
   updatedAt DateTime @updatedAt
   
   loans Loan[]
+  workers Worker[]
 
   @@map("persons")
 }
@@ -132,9 +148,55 @@ model LoanPayment {
   loanId Int
   loan Loan @relation(fields: [loanId], references: [id])
   amount Decimal @db.Decimal(10, 2)
-  date DateTime @db.Timestamp(3)
+  date DateTime @db.DateTime()
   createdAt DateTime @default(now()) @db.Timestamp(3)
   updatedAt DateTime @updatedAt
 
   @@map("loan_payments")
+}
+
+//-------------- Construction --------------------
+model Project {
+  id Int @id @default(autoincrement())
+  project String @db.VarChar(100)
+  client String @db.VarChar(100)
+  location String @db.VarChar(100)
+  transactionNo String @db.VarChar(100)
+  startDate DateTime
+  endDate DateTime
+  budget Decimal @db.Decimal(10, 2)
+  status ProjectStatus @default(PENDING)
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  worker Worker[]
+  equipement Equipment[]
+
+  @@map("projects")
+}
+
+model Worker {
+  id Int @id @default(autoincrement())
+  projectId Int
+  project Project @relation(fields: [projectId], references: [id])
+  personId Int
+  person Person @relation(fields: [personId], references: [id])
+  shiftStart DateTime
+  shiftEnd DateTime
+  createdAt DateTime @default(now()) @db.Timestamp(3)
+  updatedAt DateTime @updatedAt
+
+  @@map("workers")
+}
+
+model Equipment {
+  id Int @id @default(autoincrement())
+  projectId Int
+  project Project @relation(fields: [projectId], references: [id])
+  name String @db.VarChar(100)
+  quantity Int @db.Int
+  unit Unit
+  price Decimal @db.Decimal(10, 2)
+
+  @@map("equipments")
 }

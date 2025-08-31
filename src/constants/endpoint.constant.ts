@@ -3,5 +3,6 @@ export const ENDPOINT = {
    LOGIN: 'login',
    LOGOUT: 'logout',
    USER: 'user',
-   PERSON: 'person'
+   PERSON: 'person',
+   PROJECT: 'project'
 }
